@@ -1,7 +1,10 @@
 import { Module } from '@nestjs/common';
-import { TaskModule } from './task/task.module';
+import { TasksModule } from './tasks/tasks.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { config } from 'config/database';
+import { GoalsModule } from './goals/goals.module';
+import { KeyResultsModule } from './key-results/key-results.module';
+import { RecordsModule } from './records/records.module';
 
 const database: TypeOrmModuleOptions = {
   type: 'mysql',
@@ -13,7 +16,10 @@ const database: TypeOrmModuleOptions = {
 @Module({
   imports: [
     TypeOrmModule.forRoot(database),
-    TaskModule
+    GoalsModule,
+    TasksModule,
+    RecordsModule,
+    KeyResultsModule,
   ]
 })
 export class AppModule { }

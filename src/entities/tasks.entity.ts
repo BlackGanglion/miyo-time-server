@@ -5,17 +5,14 @@ export class Task {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'datetime' })
-  startTime: Date;
-
-  @Column({ type: 'datetime' })
-  endTime: Date;
+  @Column({ type: 'varchar', length: 255 })
+  taskName: string;
 
   @Column({ type: 'varchar', length: 255 })
-  taskDescription: string;
+  taskCron: string;
 
-  @Column({ type: 'varchar', length: 100 })
-  taskCategory: string;
+  @Column({ type: 'int', nullable: true })
+  keyResultId: number | null;
 
   @CreateDateColumn()
   createdAt: Date;
