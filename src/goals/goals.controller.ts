@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Get, Body } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { CreateGoalDto } from '../dto/goal.dto';
 
@@ -9,5 +9,10 @@ export class GoalsController {
   @Post()
   async create(@Body() createGoalDto: CreateGoalDto) {
     return this.goalsService.create(createGoalDto);
+  }
+
+  @Get()
+  async findAll() {
+    return this.goalsService.findAll();
   }
 }
