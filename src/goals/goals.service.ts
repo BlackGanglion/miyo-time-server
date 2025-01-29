@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindManyOptions } from 'typeorm';
+import { Repository, FindManyOptions, DeleteResult, UpdateResult } from 'typeorm';
 import { Goal } from '../entities/goals.entity';
 import { CreateGoalDto } from '../dto/goal.dto';
 
@@ -23,5 +23,13 @@ export class GoalsService {
       },
     };
     return this.goalsRepository.find(options);
+  }
+
+  async remove(id: string): Promise<DeleteResult> {
+    return this.goalsRepository.delete(id);
+  }
+
+  async update(id: string, updateGoalDto: Partial<CreateGoalDto>): Promise<UpdateResult> {
+    return this.goalsRepository.update(id, updateGoalDto);
   }
 }
