@@ -9,3 +9,9 @@ export class CreateKeyResultDto {
   @IsNotEmpty()
   goalId: number;
 }
+
+export class UpdateKeyResultDto extends CreateKeyResultDto {
+  @IsInt()
+  @IsNotEmpty()
+  id: number;
+}

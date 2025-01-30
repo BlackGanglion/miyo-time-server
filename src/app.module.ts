@@ -3,7 +3,6 @@ import { TasksModule } from './tasks/tasks.module';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { config } from 'config/database';
 import { GoalsModule } from './goals/goals.module';
-import { KeyResultsModule } from './key-results/key-results.module';
 import { RecordsModule } from './records/records.module';
 
 const database: TypeOrmModuleOptions = {
@@ -19,7 +18,6 @@ const database: TypeOrmModuleOptions = {
     GoalsModule,
     TasksModule,
     RecordsModule,
-    KeyResultsModule,
   ]
 })
 export class AppModule { }
