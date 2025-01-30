@@ -32,4 +32,8 @@ export class GoalsService {
   async update(id: string, updateGoalDto: Partial<CreateGoalDto>): Promise<UpdateResult> {
     return this.goalsRepository.update(id, updateGoalDto);
   }
+
+  async findOne(id: string): Promise<Goal | null> {
+    return this.goalsRepository.findOne({ where: { id: Number(id) } });
+  }
 }

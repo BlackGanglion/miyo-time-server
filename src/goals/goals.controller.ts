@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Delete, Patch, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Param, Body, Put } from '@nestjs/common';
 import { GoalsService } from './goals.service';
 import { CreateGoalDto } from '../dto/goal.dto';
 
@@ -21,8 +21,13 @@ export class GoalsController {
     return this.goalsService.remove(id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   async update(@Param('id') id: string, @Body() updateGoalDto: Partial<CreateGoalDto>) {
     return this.goalsService.update(id, updateGoalDto);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string) {
+    return this.goalsService.findOne(id);
   }
 }

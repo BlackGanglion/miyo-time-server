@@ -1,4 +1,6 @@
-import { IsString, IsNotEmpty, IsDate } from 'class-validator';
+import { IsString, IsNotEmpty, IsDate, ValidateNested, ArrayNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateKeyResultDto } from './key-result.dto';
 
 export class CreateGoalDto {
   @IsString()
