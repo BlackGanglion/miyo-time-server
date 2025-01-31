@@ -6,9 +6,11 @@ CREATE TABLE tasks (
   -- 唯一标识任务的ID
   task_name VARCHAR(255) NOT NULL,
   -- 任务名称
-  task_cron VARCHAR(255) NOT NULL,
+  task_cron VARCHAR(255) NULL,
   -- 任务周期，使用Cron表达式
-  key_result_id INT NOT NULL,
+  task_time DATETIME NULL,
+  -- 任务时间，单次
+  key_result_id INT NULL,
   -- 关联关键结果的ID
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   -- 记录创建时间

@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsOptional, IsNotEmpty } from 'class-validator';
+import { IsString, IsInt, IsOptional, IsNotEmpty, IsDate } from 'class-validator';
 
 export class CreateTaskDto {
   @IsString()
@@ -6,8 +6,12 @@ export class CreateTaskDto {
   taskName: string;
 
   @IsString()
-  @IsNotEmpty()
-  taskCron: string;
+  @IsOptional()
+  taskCron?: string;
+
+  @IsDate()
+  @IsOptional()
+  taskTime?: Date;
 
   @IsInt()
   @IsOptional()

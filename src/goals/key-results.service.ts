@@ -39,4 +39,8 @@ export class KeyResultsService {
   async findAllByGoalId(goalId: string): Promise<KeyResult[]> {
     return this.keyResultsRepository.find({ where: { goalId: Number(goalId) } });
   }
+
+  async findById(id: string): Promise<KeyResult | null> {
+    return this.keyResultsRepository.findOne({ where: { id: Number(id) } });
+  }
 }

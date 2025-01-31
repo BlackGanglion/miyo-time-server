@@ -9,7 +9,10 @@ export class Task {
   taskName: string;
 
   @Column({ type: 'varchar', length: 255 })
-  taskCron: string;
+  taskCron: string | null;
+
+  @CreateDateColumn()
+  taskTime: Date | null;
 
   @Column({ type: 'int', nullable: true })
   keyResultId: number | null;
