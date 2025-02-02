@@ -1,5 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
+export enum TaskStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+}
+
 @Entity('tasks')
 export class Task {
   @PrimaryGeneratedColumn()
@@ -8,14 +13,17 @@ export class Task {
   @Column({ type: 'varchar', length: 255 })
   taskName: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   taskCron: string | null;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ nullable: true })
   taskTime: Date | null;
 
   @Column({ type: 'int', nullable: true })
   keyResultId: number | null;
+
+  @Column({ type: 'enum', enum: TaskStatus, default: TaskStatus.PENDING })
+  status: TaskStatus;
 
   @CreateDateColumn()
   createdAt: Date;

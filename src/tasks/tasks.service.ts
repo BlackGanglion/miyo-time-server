@@ -84,4 +84,9 @@ export class TasksService {
     );
     return tasksWithKeyResultsAndGoals;
   }
+
+  // 删除任务
+  async deleteTask(taskId: string): Promise<void> {
+    await this.taskRepository.delete(taskId);
+  }
 }

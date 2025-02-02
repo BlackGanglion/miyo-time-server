@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindManyOptions, DeleteResult, UpdateResult } from 'typeorm';
+import { Repository, DeleteResult, UpdateResult } from 'typeorm';
 import { Goal } from '../entities/goals.entity';
 import { CreateGoalDto } from '../dto/goal.dto';
 import { KeyResultsService } from './key-results.service';
+import { Task } from '../entities/tasks.entity';
 
 export interface CreateGoalDtoParams extends CreateGoalDto {
   keyResults?: Array<{ resultName: string }>;
@@ -18,12 +19,14 @@ export class GoalsService {
   constructor(
     @InjectRepository(Goal)
     private goalsRepository: Repository<Goal>,
-    private readonly keyService: KeyResultsService,
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+    private readonly keyResultsService: KeyResultsService,
   ) { }
 
   async create(createGoalDto: CreateGoalDtoParams): Promise<Goal> {
     const goal = await this.goalsRepository.save(this.goalsRepository.create(createGoalDto));
-    (createGoalDto.keyResults || []).forEach(keyResult => this.keyService.create({
+    (createGoalDto.keyResults || []).forEach(keyResult => this.keyResultsService.create({
       ...keyResult,
       goalId: goal.id,
     }));
@@ -31,37 +34,48 @@ export class GoalsService {
   }
 
   async findAll(): Promise<Goal[]> {
-    const options: FindManyOptions<Goal> = {
+    const goals = await this.goalsRepository.find({
       order: {
         createdAt: 'DESC',
       },
-    };
-    return this.goalsRepository.find(options);
+    });
+    const goalsWithKeyResults = await Promise.all(goals.map(async goal => {
+      const keyResults = await this.keyResultsService.findAll(String(goal.id));
+      const tasks = await Promise.all(keyResults.map(async keyResult => {
+        return this.taskRepository.find({ where: { keyResultId: Number(keyResult.id) } });
+      }));
+      return {
+        ...goal,
+        keyResults,
+        tasks: tasks.flat(),
+      };
+    }));
+    return goalsWithKeyResults;
   }
 
   async remove(id: string): Promise<DeleteResult> {
-    await this.keyService.removeByGoalId(id);
+    await this.keyResultsService.removeByGoalId(id);
     return this.goalsRepository.delete(id);
   }
 
   async update(id: string, updateGoalDto: UpdateGoalDtoParams): Promise<UpdateResult> {
-    const existingKeyResults = await this.keyService.findAllByGoalId(id);
+    const existingKeyResults = await this.keyResultsService.findAllByGoalId(id);
 
     const keyResultsToDelete = existingKeyResults.filter(existingKeyResult =>
       !(updateGoalDto.keyResults || []).some(keyResult => keyResult.id === existingKeyResult.id)
     );
 
-    await Promise.all(keyResultsToDelete.map(keyResult => this.keyService.remove(String(keyResult.id))));
+    await Promise.all(keyResultsToDelete.map(keyResult => this.keyResultsService.remove(String(keyResult.id))));
 
     (updateGoalDto.keyResults || []).forEach(keyResult => {
       if (keyResult.id) {
-        return this.keyService.update({
+        return this.keyResultsService.update({
           resultName: keyResult.resultName,
           goalId: Number(id),
           id: keyResult.id,
         });
       }
-      return this.keyService.create({
+      return this.keyResultsService.create({
         resultName: keyResult.resultName,
         goalId: Number(id)
       });

@@ -16,15 +16,7 @@ export class GoalsController {
 
   @Get()
   async findAll() {
-    const goals = await this.goalsService.findAll();
-    const goalsWithKeyResults = await Promise.all(goals.map(async goal => {
-      const keyResults = await this.keyResultsService.findAll(String(goal.id));
-      return {
-        ...goal,
-        keyResults
-      };
-    }));
-    return goalsWithKeyResults;
+    return this.goalsService.findAll();
   }
 
   @Delete(':id')

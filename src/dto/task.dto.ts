@@ -7,11 +7,11 @@ export class CreateTaskDto {
 
   @IsString()
   @IsOptional()
-  taskCron?: string;
+  taskCron: string | null;
 
   @IsDate()
   @IsOptional()
-  taskTime?: Date;
+  taskTime: Date | null;
 
   @IsInt()
   @IsOptional()
