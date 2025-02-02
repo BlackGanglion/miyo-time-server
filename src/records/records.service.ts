@@ -47,14 +47,19 @@ export class RecordsService {
     }
   }
 
-  async findRecordsByDateRange(startDate: string, endDate: string): Promise<any> {
+  async groupByDate(startDate?: string, endDate?: string): Promise<any> {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const start = startDate || oneYearAgo.toISOString().split('T')[0];
+    const end = endDate || new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0];
+
     const records = await this.recordsRepository.find({
       where: {
-        startTime: MoreThanOrEqual(new Date(startDate)),
-        endTime: LessThanOrEqual(new Date(endDate))
+        startTime: MoreThanOrEqual(new Date(start)),
+        endTime: LessThanOrEqual(new Date(end))
       }
     });
-
+  
     const groupedRecords = records.reduce((acc, record) => {
       const startDay = record.startTime.toISOString().split('T')[0];
       const endDay = record.endTime.toISOString().split('T')[0];
@@ -74,6 +79,57 @@ export class RecordsService {
       return acc;
     }, {});
 
-    return groupedRecords;
+    return Object.keys(groupedRecords)
+      .sort((a, b) => b.localeCompare(a))
+      .reduce((pre, date) => {
+        const records = groupedRecords[date].sort((a, b) => b.id - a.id);
+        return [...pre, { date, records }]
+      }, []);
+  }
+
+  async groupByCategory(startDate?: string, endDate?: string): Promise<any> {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const start = startDate || oneYearAgo.toISOString().split('T')[0];
+    const end = endDate || new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0];
+
+    const records = await this.recordsRepository.find({
+      where: {
+        startTime: MoreThanOrEqual(new Date(start)),
+        endTime: LessThanOrEqual(new Date(end))
+      }
+    });
+
+    const groupedRecords = records.reduce((acc, record) => {
+      const category = record.category;
+
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push(record);
+
+      return acc;
+    }, {});
+
+    return Object.keys(groupedRecords)
+      .reduce((pre, category) => {
+        const records = groupedRecords[category].sort((a, b) => b.id - a.id);
+        return [...pre, { category, records }]
+      }, []);
+  }
+
+  async findRecordsGroupedByCategory(): Promise<any[]> {
+    const records = await this.recordsRepository
+      .createQueryBuilder('record')
+      .select('record.category, COUNT(record.id) AS recordCount')
+      .groupBy('record.category')
+      .orderBy('recordCount', 'DESC')
+      .getRawMany();
+
+    return records;
+  }
+
+  async delete(recordId: string): Promise<void> {
+    await this.recordsRepository.delete(recordId);
   }
 }

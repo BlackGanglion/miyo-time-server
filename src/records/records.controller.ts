@@ -1,10 +1,31 @@
-import { Controller, Post, Body, Put, Param, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Put, Param, Get, Query, Delete } from '@nestjs/common';
 import { RecordsService } from './records.service';
 import { CreateRecordDto } from '../dto/record.dto';
 
 @Controller('records')
 export class RecordsController {
   constructor(private readonly recordsService: RecordsService) { }
+
+  @Get('/groupByDate')
+  async groupByDate(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string
+  ) {
+    return this.recordsService.groupByDate(startDate, endDate);
+  }
+
+  @Get('/groupByCategory')
+  async groupByCategory(
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string
+  ) {
+    return this.recordsService.groupByCategory(startDate, endDate);
+  }
+
+  @Get('/category')
+  async categorylist() {
+    return this.recordsService.findRecordsGroupedByCategory();
+  }
 
   @Post()
   async create(@Body() createRecordDto: CreateRecordDto) {
@@ -24,15 +45,8 @@ export class RecordsController {
     return this.recordsService.findRecordById(recordId);
   }
 
-  @Get('filter')
-  async filterByDateRange(
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string
-  ) {
-    const today = new Date().toISOString().split('T')[0];
-    startDate = startDate || today;
-    endDate = endDate || today;
-
-    return this.recordsService.findRecordsByDateRange(startDate, endDate);
+  @Delete(':recordId')
+  async delete(@Param('recordId') recordId: string) {
+    return this.recordsService.delete(recordId);
   }
 }
